@@ -9,8 +9,12 @@ import { showRootComponent } from "../Common";
 import { Page } from "azure-devops-ui/Page";
 import { Header } from "azure-devops-ui/Header";
 import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, IProjectPageService, getClient } from "azure-devops-extension-api";
-import { GitPullRequestSearchCriteria, GitRestClient } from "azure-devops-extension-api/Git";
+import { GitPullRequestSearchCriteria, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/Git";
 import { CustomExtendedGitRestClient } from "../custom-typings";
+import { IPullRequest } from "./HubInterfaces";
+import { getTypedPullRequest } from "./HubUtil";
+
+
 
 interface IHubContentState {
 
@@ -52,15 +56,29 @@ class HubContent extends React.Component<{}, IHubContentState> {
 
 		console.log(this.project);
 
-		const client = getClient(GitRestClient) as CustomExtendedGitRestClient;
-		let thing = await client.getPullRequestsByProject(this.project.id);
+		const gitClient = getClient(GitRestClient) as CustomExtendedGitRestClient;
+		let openPullRequests = await gitClient.getPullRequestsByProject(this.project.id);
+		// TODO will need to pull and loop through more results.
+		let thing2 = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, undefined, 50);
 
-		if (!thing) {
+		if (!openPullRequests) {
+			this.showToast('No open pull requests found for this project.');
+		}
+		if (!thing2) {
 			this.showToast('No pull requests found for this project.');
+		}
+
+		if (!openPullRequests && !thing2) {
 			return;
 		}
 
-		console.log(thing);
+		console.log(openPullRequests);
+		console.table(openPullRequests);
+		console.log(thing2);
+
+		const typedPullRequests: IPullRequest[] = thing2.map(pr => getTypedPullRequest(pr));
+		console.log(typedPullRequests);
+		console.table(typedPullRequests);
 
 		//const repoService = await SDK.getService<IRepo
 
