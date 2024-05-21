@@ -4,7 +4,7 @@
             "id": "hub",
             "type": "ms.vss-web.hub",
             "targets": [
-                "ms.vss-work-web.work-hub-group"
+                "ms.vss-code-web.code-hub-group"
             ],
             "includes": [
                 "ms.vss-tfs-web.tfs-page-data-service",
@@ -13,14 +13,14 @@
                 "ms.vss-features.host-dialog-service"
             ],
             "properties": {
-                "name": "Starter Template",
+                "name": "Pull Request Stats",
                 "uri": "dist/Hub/Hub.html",
-                "icon": "asset://static/run.png",
+                "icon": "asset://static/logo.png",
                 "supportsMobile": true
             }
         }
     ],
     "scopes": [
-        "vso.work"
+        "vso.code"
     ]
 }

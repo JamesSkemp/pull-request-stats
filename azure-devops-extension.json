@@ -1,12 +1,12 @@
 {
     "manifestVersion": 1,
-    "id": "starter-template",
+    "id": "pull-request-stats",
     "publisher": "JamesSkemp",
-    "version": "0.0.1",
-    "name": "Starter Template",
+    "version": "0.0.4",
+    "name": "Pull Request Stats",
     "description": "Azure DevOps Extension",
     "categories": [
-        "Azure Boards"
+        "Azure Repos"
     ],
     "galleryFlags": [
         "Preview"
@@ -26,12 +26,12 @@
     },
     "links": {
         "learn": {
-            "uri": "https://git.ebacher-skemp.com/azure-devops/starter-template"
+            "uri": "https://git.ebacher-skemp.com/azure-devops/pull-request-stats"
         }
     },
     "repository": {
         "type": "git",
-        "uri": "https://git.ebacher-skemp.com/azure-devops/starter-template"
+        "uri": "https://git.ebacher-skemp.com/azure-devops/pull-request-stats"
     },
     "files": [
         {
