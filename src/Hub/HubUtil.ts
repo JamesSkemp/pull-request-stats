@@ -1,4 +1,4 @@
-import { GitPullRequest, IdentityRefWithVote } from "azure-devops-extension-api/Git";
+import { GitPullRequest, IdentityRefWithVote, PullRequestStatus } from "azure-devops-extension-api/Git";
 import { IPullRequest, IPullRequestReviewer } from "./HubInterfaces";
 
 export function getTypedPullRequest(pr: GitPullRequest): IPullRequest {
@@ -12,6 +12,7 @@ export function getTypedPullRequest(pr: GitPullRequest): IPullRequest {
 		createdByImageUrl: pr.createdBy?.imageUrl,
 		creationDate: pr.creationDate,
 		closedDate: pr.closedDate,
+		title: pr.title,
 		sourceRefName: pr.sourceRefName,
 		targetRefName: pr.targetRefName,
 		isDraft: pr.isDraft,

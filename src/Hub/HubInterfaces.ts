@@ -10,6 +10,7 @@ export interface IPullRequest {
 	createdByImageUrl: string;
 	creationDate: Date;
 	closedDate: Date | undefined;
+	title: string;
 	sourceRefName: string;
 	targetRefName: string;
 	isDraft: boolean;

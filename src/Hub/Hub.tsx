@@ -9,15 +9,15 @@ import { showRootComponent } from "../Common";
 import { Page } from "azure-devops-ui/Page";
 import { Header } from "azure-devops-ui/Header";
 import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, IProjectPageService, getClient } from "azure-devops-extension-api";
-import { GitPullRequestSearchCriteria, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/Git";
+import { GitPullRequest, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/Git";
 import { CustomExtendedGitRestClient } from "../custom-typings";
-import { IPullRequest } from "./HubInterfaces";
+import { PullRequestsListing } from "./PullRequestsListing";
 import { getTypedPullRequest } from "./HubUtil";
 
-
-
 interface IHubContentState {
-
+	project: IProjectInfo | undefined;
+	openPullRequests: GitPullRequest[];
+	allPullRequests: GitPullRequest[];
 }
 
 class HubContent extends React.Component<{}, IHubContentState> {
@@ -26,7 +26,11 @@ class HubContent extends React.Component<{}, IHubContentState> {
 	constructor(props: {}) {
 		super(props);
 
-		this.state = {};
+		this.state = {
+			project: undefined,
+			openPullRequests: [],
+			allPullRequests: []
+		};
 	}
 
 	public componentDidMount(): void {
@@ -36,9 +40,11 @@ class HubContent extends React.Component<{}, IHubContentState> {
 
 	public render(): JSX.Element {
 		return (
-			<Page>
+			<Page className="pull-request-stats flex-grow">
 				<Header title="Pull Request Stats" />
-				TODO
+				{this.state.project && <h2>Pull Requests for {this.state.project.name}</h2>}
+				<PullRequestsListing pullRequests={this.state.openPullRequests} title="Open Pull Requests" />
+				<PullRequestsListing pullRequests={this.state.allPullRequests} title="TODO Pull Requests" />
 			</Page>
 		);
 	}
@@ -53,37 +59,25 @@ class HubContent extends React.Component<{}, IHubContentState> {
 			this.showToast('No projects found.');
 			return;
 		}
-
-		console.log(this.project);
+		this.setState({ project: this.project });
 
 		const gitClient = getClient(GitRestClient) as CustomExtendedGitRestClient;
 		let openPullRequests = await gitClient.getPullRequestsByProject(this.project.id);
-		// TODO will need to pull and loop through more results.
-		let thing2 = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, undefined, 50);
 
 		if (!openPullRequests) {
 			this.showToast('No open pull requests found for this project.');
+		} else {
+			this.setState({ openPullRequests: openPullRequests });
 		}
-		if (!thing2) {
+
+		// TODO will need to pull and loop through more results.
+		let allPullRequests = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, undefined, 50);
+
+		if (!allPullRequests) {
 			this.showToast('No pull requests found for this project.');
+		} else {
+			this.setState({ allPullRequests: allPullRequests });
 		}
-
-		if (!openPullRequests && !thing2) {
-			return;
-		}
-
-		console.log(openPullRequests);
-		console.table(openPullRequests);
-		console.log(thing2);
-
-		const typedPullRequests: IPullRequest[] = thing2.map(pr => getTypedPullRequest(pr));
-		console.log(typedPullRequests);
-		console.table(typedPullRequests);
-
-		//const repoService = await SDK.getService<IRepo
-
-		//CommonServiceIds.
-
 	}
 
 	private showToast = async (message: string): Promise<void> => {
