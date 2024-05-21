@@ -1,0 +1,46 @@
+{
+    "manifestVersion": 1,
+    "id": "starter-template",
+    "publisher": "JamesSkemp",
+    "version": "0.0.1",
+    "name": "Starter Template",
+    "description": "Azure DevOps Extension",
+    "categories": [
+        "Azure Boards"
+    ],
+    "galleryFlags": [
+        "Preview"
+    ],
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "icons": {
+        "default": "logo.png"
+    },
+    "content": {
+        "details": {
+            "path": "overview.md"
+        }
+    },
+    "links": {
+        "learn": {
+            "uri": "https://git.ebacher-skemp.com/azure-devops/starter-template"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "uri": "https://git.ebacher-skemp.com/azure-devops/starter-template"
+    },
+    "files": [
+        {
+            "path": "static",
+            "addressable": true
+        },
+        {
+            "path": "dist",
+            "addressable": true
+        }
+    ]
+}
