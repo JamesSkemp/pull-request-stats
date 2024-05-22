@@ -12,7 +12,7 @@ import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, IProjectPageSer
 import { GitPullRequest, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/Git";
 import { CustomExtendedGitRestClient } from "../custom-typings";
 import { PullRequestsListing } from "./PullRequestsListing";
-import { getTypedPullRequest } from "./HubUtil";
+import { PullRequestsStats } from "./PullRequestsStats";
 
 interface IHubContentState {
 	project: IProjectInfo | undefined;
@@ -44,7 +44,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
 				<Header title="Pull Request Stats" />
 				{this.state.project && <h2>Pull Requests for {this.state.project.name}</h2>}
 				<PullRequestsListing pullRequests={this.state.openPullRequests} title="Open Pull Requests" />
-				<PullRequestsListing pullRequests={this.state.allPullRequests} title="TODO Pull Requests" />
+				<PullRequestsStats pullRequests={this.state.allPullRequests} />
 			</Page>
 		);
 	}

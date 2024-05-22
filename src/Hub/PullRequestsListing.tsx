@@ -35,12 +35,16 @@ export class PullRequestsListing extends React.Component<PullRequestsListingProp
 			);
 		}
 
-		console.table(this.typedPullRequests);
-
 		const pullRequestsDisplay = this.typedPullRequests.map(pr => {
+			const now = new Date();
+			const diffTime = Math.abs(now.getTime() - pr.creationDate.getTime());
+			const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+			const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 			return (
 				<div>
-					<a href={pr.url.replace('_apis/git/repositories', '_git').replace('/pullRequests/', '/pullrequests/')}>{pr.title}</a>
+					<a href={pr.url.replace('_apis/git/repositories', '_git').replace('/pullRequests/', '/pullrequest/')} target="_blank">{pr.title}</a> ({pr.repositoryName})<br />
+					{pr.isDraft && 'Draft'} Created {pr.creationDate.toLocaleString()} by {pr.createdByDisplayName}<br />
+					Open for {diffTime} milliseconds / {diffHours} hours / {diffDays} days.
 				</div>
 			);
 		});
