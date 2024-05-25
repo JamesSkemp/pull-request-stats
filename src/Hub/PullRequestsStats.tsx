@@ -31,7 +31,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 
 		return (
 			<Card className="pull-requests-stats"
-				titleProps={{ text: 'Stats', ariaLevel: 2 }}>
+				titleProps={{ text: `Stats for ${this.typedPullRequests.length} pull requests`, ariaLevel: 2 }}>
 				<section>
 					TODO
 				</section>

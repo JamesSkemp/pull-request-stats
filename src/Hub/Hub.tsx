@@ -71,11 +71,26 @@ class HubContent extends React.Component<{}, IHubContentState> {
 		}
 
 		// TODO will need to pull and loop through more results.
-		let allPullRequests = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, undefined, 50);
+		const pullRequestsToPullAtOnce = 100;
+		let allPullRequests = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, undefined, pullRequestsToPullAtOnce);
 
 		if (!allPullRequests) {
 			this.showToast('No pull requests found for this project.');
 		} else {
+			if (allPullRequests.length === pullRequestsToPullAtOnce) {
+				let getMorePrs = true;
+				let additionalPullRequests: GitPullRequest[] = [];
+				while (getMorePrs) {
+					additionalPullRequests = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, allPullRequests.length, pullRequestsToPullAtOnce);
+					if (additionalPullRequests) {
+						getMorePrs = additionalPullRequests.length === pullRequestsToPullAtOnce;
+						allPullRequests.push(...additionalPullRequests);
+					} else {
+						getMorePrs = false;
+					}
+				}
+			}
+
 			this.setState({ allPullRequests: allPullRequests });
 		}
 	}
