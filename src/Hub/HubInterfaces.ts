@@ -1,4 +1,4 @@
-import { PullRequestStatus } from "azure-devops-extension-api/Git";
+import { PullRequestAsyncStatus, PullRequestStatus } from "azure-devops-extension-api/Git";
 
 export interface IPullRequest {
 	repositoryId: string;
@@ -16,6 +16,7 @@ export interface IPullRequest {
 	isDraft: boolean;
 	reviewers: IPullRequestReviewer[];
 	url: string;
+	mergeStatus: PullRequestAsyncStatus;
 }
 
 export interface IPullRequestReviewer {

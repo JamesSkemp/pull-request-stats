@@ -37,7 +37,7 @@
     "css-loader": "^6.10.0",
     "loader-utils": "^2.0.4",
     "rimraf": "~2.6.3",
-    "sass": "^1.72.0",
+    "sass": "^1.77.2",
     "sass-loader": "^13.3.3",
     "style-loader": "~3.3.4",
     "tfx-cli": "^0.17.0",

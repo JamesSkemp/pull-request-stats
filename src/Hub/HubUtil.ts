@@ -17,7 +17,8 @@ export function getTypedPullRequest(pr: GitPullRequest): IPullRequest {
 		targetRefName: pr.targetRefName,
 		isDraft: pr.isDraft,
 		reviewers: pr.reviewers.map(r => getTypedPullRequestReviewer(r)),
-		url: pr.url
+		url: pr.url,
+		mergeStatus: pr.mergeStatus
 	};
 }
 
