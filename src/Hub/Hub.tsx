@@ -70,7 +70,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
 			this.setState({ openPullRequests: openPullRequests });
 		}
 
-		// TODO will need to pull and loop through more results.
+		// Number of pull requests to pull from the API at once.
 		const pullRequestsToPullAtOnce = 100;
 		let allPullRequests = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, undefined, pullRequestsToPullAtOnce);
 

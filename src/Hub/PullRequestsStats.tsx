@@ -33,9 +33,38 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 			<Card className="pull-requests-stats"
 				titleProps={{ text: `Stats for ${this.typedPullRequests.length} pull requests`, ariaLevel: 2 }}>
 				<section>
+					<h3>Authors</h3>
+					<div>
+						{[...pullRequestCreators.keys()].map(prc => {
+							let creator = pullRequestCreators.get(prc);
+							if (creator) {
+								return (
+									<div>
+										<img src={creator[0].createdByImageUrl} alt="" /> {creator[0].createdByDisplayName} = {creator.length}
+									</div>
+								);
+							} else {
+								return null;
+							}
+						})}
+					</div>
 					TODO
 				</section>
 			</Card>
 		);
+	}
+
+	private getPullRequestCreators(pullRequests: IPullRequest[]): Map<string, IPullRequest[]> {
+		const map = new Map();
+		pullRequests.forEach((pr) => {
+			const key = pr.createdById;
+			const collection = map.get(key);
+			if (!collection) {
+				map.set(key, [pr]);
+			} else {
+				collection.push(pr);
+			}
+		});
+		return map;
 	}
 }
