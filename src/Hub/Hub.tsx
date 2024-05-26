@@ -71,13 +71,14 @@ class HubContent extends React.Component<{}, IHubContentState> {
 		}
 
 		// Number of pull requests to pull from the API at once.
-		const pullRequestsToPullAtOnce = 100;
+		const pullRequestsToPullAtOnce = 200;
 		let allPullRequests = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, undefined, pullRequestsToPullAtOnce);
 
 		if (!allPullRequests) {
 			this.showToast('No pull requests found for this project.');
 		} else {
 			if (allPullRequests.length === pullRequestsToPullAtOnce) {
+				// Set this to false for faster development. Otherwise set to true to pull all pull requests.
 				let getMorePrs = true;
 				let additionalPullRequests: GitPullRequest[] = [];
 				while (getMorePrs) {
