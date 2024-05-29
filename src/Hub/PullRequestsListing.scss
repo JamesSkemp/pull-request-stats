@@ -32,7 +32,16 @@
 		}
 	}
 
+	span.creator {
+		display: inline-block;
+
+		&>img {
+			height: 16px;
+		}
+	}
+
 	span.reviewer {
+		display: inline-block;
 		margin-right: 1em;
 
 		&>img {

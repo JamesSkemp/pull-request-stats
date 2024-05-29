@@ -50,7 +50,7 @@ export class PullRequestsListing extends React.Component<PullRequestsListingProp
 							{pr.isDraft ? 'Draft' : 'Active'}
 						</div>
 					</div>
-					Created {pr.creationDate.toLocaleString()} by {pr.createdByDisplayName}<br />
+					Created {pr.creationDate.toLocaleString()} by <span className="creator"><img src={pr.createdByImageUrl} alt="" /> {pr.createdByDisplayName}</span><br />
 					{pr.sourceRefName} into {pr.targetRefName}<br />
 					Open for {diffTime} milliseconds / {diffHours} hours / {diffDays} days.<br />
 					{pr.reviewers.map(r => {

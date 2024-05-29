@@ -1,6 +1,8 @@
 import * as React from "react";
 import "./PullRequests.scss";
 import { IPullRequest } from "./HubInterfaces";
+import { VoteDisplay } from "./VoteDisplay";
+import { PullRequestStatus } from "azure-devops-extension-api/Git";
 
 export interface PullRequestsProps {
 	pullRequests: IPullRequest[] | undefined;
@@ -12,6 +14,24 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 
 	constructor(props: PullRequestsProps) {
 		super(props);
+	}
+
+	getClosedDateDisplay(closedDate: Date | undefined, mergeStatus: PullRequestStatus): JSX.Element | null {
+		if (!closedDate) {
+			return null;
+		}
+		if (mergeStatus == PullRequestStatus.Abandoned) {
+			return (
+				<React.Fragment>
+					Abandoned {closedDate.toLocaleString()}<br />
+				</React.Fragment>
+			);
+		}
+		return (
+			<React.Fragment>
+				Completed {closedDate.toLocaleString()}<br />
+			</React.Fragment>
+		);
 	}
 
 	public render(): JSX.Element | null {
@@ -28,7 +48,13 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 		const pullRequestsDisplay = this.typedPullRequests.map(pr => {
 			return (
 				<div>
-					{pr.pullRequestId}
+					<a href={pr.url.replace('_apis/git/repositories', '_git').replace('/pullRequests/', '/pullrequest/')} target="_blank">{pr.title}</a> ({pr.repositoryName})<br />
+					Created {pr.creationDate.toLocaleString()} by <span className="creator"><img src={pr.createdByImageUrl} alt="" /> {pr.createdByDisplayName}</span><br />
+					{this.getClosedDateDisplay(pr.closedDate, pr.status)}
+					{pr.sourceRefName} into {pr.targetRefName}<br />
+					{pr.reviewers.map(r => {
+						return <span className="reviewer"><VoteDisplay vote={r.vote} /> <img src={r.imageUrl} alt="" /> {r.displayName} {r.hasDeclined} {r.isFlagged}</span>;
+					})}
 				</div>
 			)
 		});
@@ -36,7 +62,9 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 		return (
 			<div>
 				<h3>{this.props.heading}</h3>
-				{pullRequestsDisplay}
+				<section className="pull-requests">
+					{pullRequestsDisplay}
+				</section>
 			</div>
 		);
 	}

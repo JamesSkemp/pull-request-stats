@@ -1,4 +1,4 @@
-import { GitPullRequest, IdentityRefWithVote, PullRequestStatus } from "azure-devops-extension-api/Git";
+import { GitPullRequest, IdentityRefWithVote } from "azure-devops-extension-api/Git";
 import { IPullRequest, IPullRequestReviewer } from "./HubInterfaces";
 
 export function getTypedPullRequest(pr: GitPullRequest): IPullRequest {
