@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "pull-request-stats",
     "publisher": "JamesSkemp",
-    "version": "0.0.64",
+    "version": "0.0.71",
     "name": "Pull Request Stats",
     "description": "Azure DevOps Extension",
     "categories": [
@@ -27,6 +27,9 @@
     "links": {
         "learn": {
             "uri": "https://git.ebacher-skemp.com/azure-devops/pull-request-stats"
+        },
+        "support": {
+            "uri": "https://github.com/JamesSkemp/pull-request-stats/issues"
         }
     },
     "repository": {

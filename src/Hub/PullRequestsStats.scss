@@ -5,4 +5,10 @@
 	img {
 		height: 16px;;
 	}
+
+	.stat-blocks {
+		display: grid;
+		gap: 1em;
+		grid-template-columns: repeat(2, 45vw);
+	}
 }

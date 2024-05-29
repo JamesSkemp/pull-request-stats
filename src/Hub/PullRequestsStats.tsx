@@ -4,6 +4,7 @@ import { GitPullRequest } from "azure-devops-extension-api/Git";
 import { IPullRequest } from "./HubInterfaces";
 import { Card } from "azure-devops-ui/Card";
 import { getTypedPullRequest } from "./HubUtil";
+import { PullRequests } from "./PullRequests";
 
 export interface PullRequestsStatsProps {
 	pullRequests: GitPullRequest[];
@@ -11,6 +12,11 @@ export interface PullRequestsStatsProps {
 
 export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 	private typedPullRequests: IPullRequest[] = [];
+	private creatorPullRequests: IPullRequest[] = [];
+	private repositoryPullRequests: IPullRequest[] = [];
+	private finalReviewerPullRequests: IPullRequest[] = [];
+	private totalReviewerPullRequests: IPullRequest[] = [];
+	private closeTimePullRequests: IPullRequest[] = [];
 
 	constructor(props: PullRequestsStatsProps) {
 		super(props);
@@ -37,94 +43,119 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 		return (
 			<Card className="pull-requests-stats"
 				titleProps={{ text: `Stats for ${this.typedPullRequests.length} pull requests`, ariaLevel: 2 }}>
-				<section>
-					<h3>Authors</h3>
-					<p>This tracks who created pull requests.</p>
-					<div>
-						{[...pullRequestCreators.keys()].sort((a, b) => a.localeCompare(b)).map(prc => {
-							let creator = pullRequestCreators.get(prc);
-							if (creator) {
-								return (
-									<div>
-										<img src={creator[0].createdByImageUrl} alt="" /> {creator[0].createdByDisplayName} = {creator.length}
-									</div>
-								);
-							} else {
-								return null;
-							}
-						})}
-					</div>
-					<h3>Repositories</h3>
-					<div>
-						{[...pullRequestRepositories.keys()].map(repo => {
-							let repository = pullRequestRepositories.get(repo);
-							if (repository) {
-								return (
-									<div>
-										{repository[0].repositoryName} = {repository.length}
-									</div>
-								);
-							} else {
-								return null;
-							}
-						})}
-					</div>
-					<h3>Final Reviewers</h3>
-					<p>This tracks how often an individual voted on a closed pull request. This does not track if they ever voted on it, only if they had voted when it was closed.</p>
-					<div>
-						{[...pullRequestFinalReviewers.keys()].sort((a, b) => a.localeCompare(b)).map(reviewer => {
-							let prs = pullRequestFinalReviewers.get(reviewer);
-							if (prs) {
-								return (
-									<div>
-										{reviewer} = {prs.length}
-									</div>
-								);
-							} else {
-								return null;
-							}
-						})}
-					</div>
-					<h3>Total Reviewers</h3>
-					<p>This tracks the number of reviewers who were marked as voting on a closed pull request, when it was closed.</p>
-					<div>
-						{[...pullRequestTotalReviewers.keys()].sort((a, b) => a - b).map(reviewerCount => {
-							let count = pullRequestTotalReviewers.get(reviewerCount);
-							if (count) {
-								return (
-									<div>
-										{reviewerCount} reviewers = {count.length}
-									</div>
-								);
-							} else {
-								return null;
-							}
-						})}
-					</div>
-					<h3>Close Time</h3>
-					<p>This tracks the amount of time a pull request was open before it was closed. Times are rounded down.</p>
-					<div>
-						{[...pullRequestCloseTimes.keys()].sort((a, b) => a - b).map(closeTime => {
-							let closeTimes = pullRequestCloseTimes.get(closeTime);
-							if (closeTimes) {
-								if (closeTime >= 1) {
+				<section className="stat-blocks">
+					<section>
+						<h3>Authors</h3>
+						<p>This tracks who created pull requests.</p>
+						<div>
+							{[...pullRequestCreators.keys()].sort((a, b) => a.localeCompare(b)).map(prc => {
+								let creator = pullRequestCreators.get(prc);
+								if (creator) {
 									return (
 										<div>
-											~{closeTime} day(s) = {closeTimes.length}
+											<img src={creator[0].createdByImageUrl} alt="" /> <span>{creator[0].createdByDisplayName}</span> = {creator.length}
 										</div>
 									);
 								} else {
+									return null;
+								}
+							})}
+						</div>
+					</section>
+					<section>
+						<PullRequests pullRequests={this.creatorPullRequests} heading="Author Pull Requests"></PullRequests>
+					</section>
+					<section>
+						<h3>Repositories</h3>
+						<div>
+							{[...pullRequestRepositories.keys()].map(repo => {
+								let repository = pullRequestRepositories.get(repo);
+								if (repository) {
 									return (
 										<div>
-											~{Math.floor(closeTime * 100)} hour(s) = {closeTimes.length}
+											<span>{repository[0].repositoryName}</span> = {repository.length}
 										</div>
 									);
+								} else {
+									return null;
 								}
-							} else {
-								return null;
-							}
-						})}
-					</div>
+							})}
+						</div>
+					</section>
+					<section>
+						<PullRequests pullRequests={this.repositoryPullRequests} heading="Repository Pull Requests"></PullRequests>
+					</section>
+					<section>
+						<h3>Final Reviewers</h3>
+						<p>This tracks how often an individual voted on a closed pull request. This does not track if they ever voted on it, only if they had voted when it was closed.</p>
+						<div>
+							{[...pullRequestFinalReviewers.keys()].sort((a, b) => a.localeCompare(b)).map(reviewer => {
+								let prs = pullRequestFinalReviewers.get(reviewer);
+								if (prs) {
+									return (
+										<div>
+											<span>{reviewer}</span> = {prs.length}
+										</div>
+									);
+								} else {
+									return null;
+								}
+							})}
+						</div>
+					</section>
+					<section>
+						<PullRequests pullRequests={this.finalReviewerPullRequests} heading="Final Reviewer Pull Requests"></PullRequests>
+					</section>
+					<section>
+						<h3>Total Reviewers</h3>
+						<p>This tracks the number of reviewers who were marked as voting on a closed pull request, when it was closed.</p>
+						<div>
+							{[...pullRequestTotalReviewers.keys()].sort((a, b) => a - b).map(reviewerCount => {
+								let count = pullRequestTotalReviewers.get(reviewerCount);
+								if (count) {
+									return (
+										<div>
+											<span>{reviewerCount} reviewers</span> = {count.length}
+										</div>
+									);
+								} else {
+									return null;
+								}
+							})}
+						</div>
+					</section>
+					<section>
+						<PullRequests pullRequests={this.totalReviewerPullRequests} heading="Total Reviewer Pull Requests"></PullRequests>
+					</section>
+					<section>
+						<h3>Close Time</h3>
+						<p>This tracks the amount of time a pull request was open before it was closed. Times are rounded down.</p>
+						<div>
+							{[...pullRequestCloseTimes.keys()].sort((a, b) => a - b).map(closeTime => {
+								let closeTimes = pullRequestCloseTimes.get(closeTime);
+								if (closeTimes) {
+									if (closeTime >= 1) {
+										return (
+											<div>
+												<span>&lt; {closeTime} day(s)</span> = {closeTimes.length}
+											</div>
+										);
+									} else {
+										return (
+											<div>
+												<span>&lt; {Math.floor(closeTime * 100)} hour(s)</span> = {closeTimes.length}
+											</div>
+										);
+									}
+								} else {
+									return null;
+								}
+							})}
+						</div>
+					</section>
+					<section>
+						<PullRequests pullRequests={this.closeTimePullRequests} heading="Close Time Pull Requests"></PullRequests>
+					</section>
 				</section>
 			</Card>
 		);
@@ -193,9 +224,11 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 		const map = new Map();
 		pullRequests.filter(pr => pr.closedDate !== undefined).forEach(pr => {
 			const diffTime = Math.abs(pr.closedDate!.getTime() - pr.creationDate.getTime());
-			const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-			const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-			const key = diffDays > 0 ? diffDays : diffHours / 100;
+			const msInOneHour = 1000 * 60 * 60;
+			const msInOneDay = msInOneHour * 24;
+			const diffHours = Math.ceil(diffTime / msInOneHour);
+			const diffDays = Math.ceil(diffTime / msInOneDay);
+			const key = diffTime >= msInOneDay ? diffDays : diffHours / 100;
 			const collection = map.get(key);
 			if (!collection) {
 				map.set(key, [pr]);
