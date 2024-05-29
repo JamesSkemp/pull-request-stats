@@ -10,16 +10,27 @@ export interface PullRequestsStatsProps {
 	pullRequests: GitPullRequest[];
 }
 
-export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
+interface IPullRequestsStatsState {
+	creatorPullRequests: IPullRequest[];
+	repositoryPullRequests: IPullRequest[];
+	finalReviewerPullRequests: IPullRequest[];
+	totalReviewerPullRequests: IPullRequest[];
+	closeTimePullRequests: IPullRequest[];
+}
+
+export class PullRequestsStats extends React.Component<PullRequestsStatsProps, IPullRequestsStatsState> {
 	private typedPullRequests: IPullRequest[] = [];
-	private creatorPullRequests: IPullRequest[] = [];
-	private repositoryPullRequests: IPullRequest[] = [];
-	private finalReviewerPullRequests: IPullRequest[] = [];
-	private totalReviewerPullRequests: IPullRequest[] = [];
-	private closeTimePullRequests: IPullRequest[] = [];
 
 	constructor(props: PullRequestsStatsProps) {
 		super(props);
+
+		this.state = {
+			creatorPullRequests: [],
+			repositoryPullRequests: [],
+			finalReviewerPullRequests: [],
+			totalReviewerPullRequests: [],
+			closeTimePullRequests: []
+		}
 	}
 
 	public render(): JSX.Element | null {
@@ -32,7 +43,6 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 		if (!this.typedPullRequests.length) {
 			return null;
 		}
-
 
 		const pullRequestCreators = this.getPullRequestCreators(this.typedPullRequests);
 		const pullRequestRepositories = this.getPullRequestRepositories(this.typedPullRequests);
@@ -53,7 +63,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 								if (creator) {
 									return (
 										<div>
-											<img src={creator[0].createdByImageUrl} alt="" /> <span>{creator[0].createdByDisplayName}</span> = {creator.length}
+											<img src={creator[0].createdByImageUrl} alt="" /> <span onClick={() => this.setState({ creatorPullRequests: creator! })}>{creator[0].createdByDisplayName}</span> = {creator.length}
 										</div>
 									);
 								} else {
@@ -63,7 +73,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 						</div>
 					</section>
 					<section>
-						<PullRequests pullRequests={this.creatorPullRequests} heading="Author Pull Requests"></PullRequests>
+						<PullRequests pullRequests={this.state.creatorPullRequests} heading="Author Pull Requests"></PullRequests>
 					</section>
 					<section>
 						<h3>Repositories</h3>
@@ -73,7 +83,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 								if (repository) {
 									return (
 										<div>
-											<span>{repository[0].repositoryName}</span> = {repository.length}
+											<span onClick={() => this.setState({ repositoryPullRequests: repository! })}>{repository[0].repositoryName}</span> = {repository.length}
 										</div>
 									);
 								} else {
@@ -83,7 +93,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 						</div>
 					</section>
 					<section>
-						<PullRequests pullRequests={this.repositoryPullRequests} heading="Repository Pull Requests"></PullRequests>
+						<PullRequests pullRequests={this.state.repositoryPullRequests} heading="Repository Pull Requests"></PullRequests>
 					</section>
 					<section>
 						<h3>Final Reviewers</h3>
@@ -94,7 +104,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 								if (prs) {
 									return (
 										<div>
-											<span>{reviewer}</span> = {prs.length}
+											<span onClick={() => this.setState({ finalReviewerPullRequests: prs! })}>{reviewer}</span> = {prs.length}
 										</div>
 									);
 								} else {
@@ -104,7 +114,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 						</div>
 					</section>
 					<section>
-						<PullRequests pullRequests={this.finalReviewerPullRequests} heading="Final Reviewer Pull Requests"></PullRequests>
+						<PullRequests pullRequests={this.state.finalReviewerPullRequests} heading="Final Reviewer Pull Requests"></PullRequests>
 					</section>
 					<section>
 						<h3>Total Reviewers</h3>
@@ -115,7 +125,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 								if (count) {
 									return (
 										<div>
-											<span>{reviewerCount} reviewers</span> = {count.length}
+											<span onClick={() => this.setState({ totalReviewerPullRequests: count! })}>{reviewerCount} reviewers</span> = {count.length}
 										</div>
 									);
 								} else {
@@ -125,7 +135,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 						</div>
 					</section>
 					<section>
-						<PullRequests pullRequests={this.totalReviewerPullRequests} heading="Total Reviewer Pull Requests"></PullRequests>
+						<PullRequests pullRequests={this.state.totalReviewerPullRequests} heading="Total Reviewer Pull Requests"></PullRequests>
 					</section>
 					<section>
 						<h3>Close Time</h3>
@@ -137,13 +147,13 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 									if (closeTime >= 1) {
 										return (
 											<div>
-												<span>&lt; {closeTime} day(s)</span> = {closeTimes.length}
+												<span onClick={() => this.setState({ closeTimePullRequests: closeTimes! })}>&lt; {closeTime} day(s)</span> = {closeTimes.length}
 											</div>
 										);
 									} else {
 										return (
 											<div>
-												<span>&lt; {Math.floor(closeTime * 100)} hour(s)</span> = {closeTimes.length}
+												<span onClick={() => this.setState({ closeTimePullRequests: closeTimes! })}>&lt; {Math.floor(closeTime * 100)} hour(s)</span> = {closeTimes.length}
 											</div>
 										);
 									}
@@ -154,7 +164,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps> {
 						</div>
 					</section>
 					<section>
-						<PullRequests pullRequests={this.closeTimePullRequests} heading="Close Time Pull Requests"></PullRequests>
+						<PullRequests pullRequests={this.state.closeTimePullRequests} heading="Close Time Pull Requests"></PullRequests>
 					</section>
 				</section>
 			</Card>

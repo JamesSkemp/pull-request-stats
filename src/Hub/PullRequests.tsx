@@ -3,7 +3,7 @@ import "./PullRequests.scss";
 import { IPullRequest } from "./HubInterfaces";
 
 export interface PullRequestsProps {
-	pullRequests: IPullRequest[];
+	pullRequests: IPullRequest[] | undefined;
 	heading: string;
 }
 
@@ -15,7 +15,7 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 	}
 
 	public render(): JSX.Element | null {
-		if (this.props.pullRequests.length) {
+		if (this.props.pullRequests?.length) {
 			this.typedPullRequests = this.props.pullRequests;
 		} else {
 			this.typedPullRequests = [];
