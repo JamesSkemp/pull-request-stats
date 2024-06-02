@@ -1,16 +1,20 @@
 import * as React from "react";
+import * as SDK from "azure-devops-extension-sdk";
 import "./PullRequestsStats.scss";
-import { GitPullRequest } from "azure-devops-extension-api/Git";
+import { GitPullRequest, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/Git";
 import { IPullRequest } from "./HubInterfaces";
 import { Card } from "azure-devops-ui/Card";
 import { getTypedPullRequest } from "./HubUtil";
 import { PullRequests } from "./PullRequests";
+import { CustomExtendedGitRestClient } from "../custom-typings";
+import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, getClient } from "azure-devops-extension-api";
 
 export interface PullRequestsStatsProps {
-	pullRequests: GitPullRequest[];
+	project: IProjectInfo | undefined;
 }
 
 interface IPullRequestsStatsState {
+	pullRequests: GitPullRequest[];
 	creatorPullRequests: IPullRequest[];
 	repositoryPullRequests: IPullRequest[];
 	finalReviewerPullRequests: IPullRequest[];
@@ -25,6 +29,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		super(props);
 
 		this.state = {
+			pullRequests: [],
 			creatorPullRequests: [],
 			repositoryPullRequests: [],
 			finalReviewerPullRequests: [],
@@ -33,9 +38,14 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		}
 	}
 
+	public componentDidMount(): void {
+		SDK.init();
+		this.getPullRequests();
+	}
+
 	public render(): JSX.Element | null {
-		if (this.props.pullRequests.length) {
-			this.typedPullRequests = this.props.pullRequests.map(pr => getTypedPullRequest(pr));
+		if (this.state.pullRequests.length) {
+			this.typedPullRequests = this.state.pullRequests.map(pr => getTypedPullRequest(pr));
 		} else {
 			this.typedPullRequests = [];
 		}
@@ -171,6 +181,44 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		);
 	}
 
+	private async getPullRequests() {
+		let projectId = '';
+		if (this.props.project) {
+			projectId = this.props.project.id;
+		} else {
+			return;
+		}
+
+		await SDK.ready();
+
+		const gitClient = getClient(GitRestClient) as CustomExtendedGitRestClient;
+
+		// Number of pull requests to pull from the API at once.
+		const pullRequestsToPullAtOnce = 250;
+		let allPullRequests = await gitClient.getPullRequestsByProject(projectId, { status: PullRequestStatus.All }, undefined, undefined, pullRequestsToPullAtOnce);
+
+		if (!allPullRequests) {
+			this.showToast('No pull requests found for this project.');
+		} else {
+			if (allPullRequests.length === pullRequestsToPullAtOnce) {
+				// Set this to false for faster development. Otherwise set to true to pull all pull requests.
+				let getMorePrs = false;
+				let additionalPullRequests: GitPullRequest[] = [];
+				while (getMorePrs) {
+					additionalPullRequests = await gitClient.getPullRequestsByProject(projectId, { status: PullRequestStatus.All }, undefined, allPullRequests.length, pullRequestsToPullAtOnce);
+					if (additionalPullRequests) {
+						getMorePrs = additionalPullRequests.length === pullRequestsToPullAtOnce;
+						allPullRequests.push(...additionalPullRequests);
+					} else {
+						getMorePrs = false;
+					}
+				}
+			}
+
+			this.setState({ pullRequests: allPullRequests });
+		}
+	}
+
 	private getPullRequestCreators(pullRequests: IPullRequest[]): Map<string, IPullRequest[]> {
 		const map = new Map();
 		pullRequests.forEach((pr) => {
@@ -247,5 +295,13 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 			}
 		});
 		return map;
+	}
+
+	private showToast = async (message: string): Promise<void> => {
+		const globalMessageSvc = await SDK.getService<IGlobalMessagesService>(CommonServiceIds.GlobalMessagesService);
+		globalMessageSvc.addToast({
+			duration: 3000,
+			message: message
+		});
 	}
 }

@@ -9,7 +9,7 @@ import { showRootComponent } from "../Common";
 import { Page } from "azure-devops-ui/Page";
 import { Header } from "azure-devops-ui/Header";
 import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, IProjectPageService, getClient } from "azure-devops-extension-api";
-import { GitPullRequest, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/Git";
+import { GitPullRequest, GitRestClient } from "azure-devops-extension-api/Git";
 import { CustomExtendedGitRestClient } from "../custom-typings";
 import { PullRequestsListing } from "./PullRequestsListing";
 import { PullRequestsStats } from "./PullRequestsStats";
@@ -17,7 +17,6 @@ import { PullRequestsStats } from "./PullRequestsStats";
 interface IHubContentState {
 	project: IProjectInfo | undefined;
 	openPullRequests: GitPullRequest[];
-	allPullRequests: GitPullRequest[];
 }
 
 class HubContent extends React.Component<{}, IHubContentState> {
@@ -28,8 +27,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
 
 		this.state = {
 			project: undefined,
-			openPullRequests: [],
-			allPullRequests: []
+			openPullRequests: []
 		};
 	}
 
@@ -44,7 +42,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
 				<Header title="Pull Request Stats" />
 				{this.state.project && <h2>Pull Requests for {this.state.project.name}</h2>}
 				<PullRequestsListing pullRequests={this.state.openPullRequests} title="Open Pull Requests" />
-				<PullRequestsStats pullRequests={this.state.allPullRequests} />
+				{this.state.project && <PullRequestsStats project={this.state.project} />}
 			</Page>
 		);
 	}
@@ -68,31 +66,6 @@ class HubContent extends React.Component<{}, IHubContentState> {
 			this.showToast('No open pull requests found for this project.');
 		} else {
 			this.setState({ openPullRequests: openPullRequests });
-		}
-
-		// Number of pull requests to pull from the API at once.
-		const pullRequestsToPullAtOnce = 200;
-		let allPullRequests = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, undefined, pullRequestsToPullAtOnce);
-
-		if (!allPullRequests) {
-			this.showToast('No pull requests found for this project.');
-		} else {
-			if (allPullRequests.length === pullRequestsToPullAtOnce) {
-				// Set this to false for faster development. Otherwise set to true to pull all pull requests.
-				let getMorePrs = true;
-				let additionalPullRequests: GitPullRequest[] = [];
-				while (getMorePrs) {
-					additionalPullRequests = await gitClient.getPullRequestsByProject(this.project.id, { status: PullRequestStatus.All }, undefined, allPullRequests.length, pullRequestsToPullAtOnce);
-					if (additionalPullRequests) {
-						getMorePrs = additionalPullRequests.length === pullRequestsToPullAtOnce;
-						allPullRequests.push(...additionalPullRequests);
-					} else {
-						getMorePrs = false;
-					}
-				}
-			}
-
-			this.setState({ allPullRequests: allPullRequests });
 		}
 	}
 
