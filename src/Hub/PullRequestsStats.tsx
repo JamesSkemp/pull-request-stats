@@ -8,6 +8,9 @@ import { getTypedPullRequest } from "./HubUtil";
 import { PullRequests } from "./PullRequests";
 import { CustomExtendedGitRestClient } from "../custom-typings";
 import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, getClient } from "azure-devops-extension-api";
+import { Dropdown } from "azure-devops-ui/Dropdown";
+import { IListBoxItem } from "azure-devops-ui/ListBox";
+import { ListSelection } from "azure-devops-ui/List";
 
 export interface PullRequestsStatsProps {
 	project: IProjectInfo | undefined;
@@ -20,10 +23,14 @@ interface IPullRequestsStatsState {
 	finalReviewerPullRequests: IPullRequest[];
 	totalReviewerPullRequests: IPullRequest[];
 	closeTimePullRequests: IPullRequest[];
+	selectedFilterId: string;
+	selectedFilterText: string;
 }
 
 export class PullRequestsStats extends React.Component<PullRequestsStatsProps, IPullRequestsStatsState> {
 	private typedPullRequests: IPullRequest[] = [];
+	private filteredPullRequests: IPullRequest[] = [];
+	private filterSelection = new ListSelection();
 
 	constructor(props: PullRequestsStatsProps) {
 		super(props);
@@ -34,7 +41,9 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 			repositoryPullRequests: [],
 			finalReviewerPullRequests: [],
 			totalReviewerPullRequests: [],
-			closeTimePullRequests: []
+			closeTimePullRequests: [],
+			selectedFilterId: '',
+			selectedFilterText: ''
 		}
 	}
 
@@ -54,15 +63,89 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 			return null;
 		}
 
-		const pullRequestCreators = this.getPullRequestCreators(this.typedPullRequests);
-		const pullRequestRepositories = this.getPullRequestRepositories(this.typedPullRequests);
-		const pullRequestFinalReviewers = this.getPullRequestFinalReviewers(this.typedPullRequests);
-		const pullRequestTotalReviewers = this.getPullRequestTotalReviewers(this.typedPullRequests);
-		const pullRequestCloseTimes = this.getPullRequestCloseTimes(this.typedPullRequests);
+		const currentDate = new Date();
+
+		switch (this.state.selectedFilterId) {
+			case "c100":
+				this.filteredPullRequests = this.typedPullRequests.slice(0, 100);
+				break;
+			case "c200":
+				this.filteredPullRequests = this.typedPullRequests.slice(0, 200);
+				break;
+			case "c500":
+				this.filteredPullRequests = this.typedPullRequests.slice(0, 500);
+				break;
+			case "c1000":
+				this.filteredPullRequests = this.typedPullRequests.slice(0, 1000);
+				break;
+			case "t7days":
+				this.filteredPullRequests = this.typedPullRequests
+					.filter(pr => pr.creationDate >= new Date(new Date().setDate(currentDate.getDate() - 7)));
+				break;
+			case "t14days":
+				this.filteredPullRequests = this.typedPullRequests
+					.filter(pr => pr.creationDate >= new Date(new Date().setDate(currentDate.getDate() - 14)));
+				break;
+			case "t30days":
+				this.filteredPullRequests = this.typedPullRequests
+					.filter(pr => pr.creationDate >= new Date(new Date().setDate(currentDate.getDate() - 30)));
+				break;
+			case "t60days":
+				this.filteredPullRequests = this.typedPullRequests
+					.filter(pr => pr.creationDate >= new Date(new Date().setDate(currentDate.getDate() - 60)));
+				break;
+			case "t90days":
+				this.filteredPullRequests = this.typedPullRequests
+					.filter(pr => pr.creationDate >= new Date(new Date().setDate(currentDate.getDate() - 90)));
+				break;
+			case "t1year":
+				this.filteredPullRequests = this.typedPullRequests
+					.filter(pr => pr.creationDate >= new Date(new Date().setFullYear(currentDate.getFullYear() - 1)));
+				break;
+			case "all":
+				this.filteredPullRequests = [...this.typedPullRequests];
+				break;
+			default:
+				this.filteredPullRequests = this.typedPullRequests.slice(0, 100);
+				break;
+		}
+
+		function filterOptions(): Array<IListBoxItem<{}>> {
+			return [
+				{ id: "c100", text: "Last 100 pull requests" },
+				{ id: "c200", text: "Last 200 pull requests" },
+				{ id: "c500", text: "Last 500 pull requests" },
+				{ id: "c1000", text: "Last 1000 pull requests" },
+				{ id: "t7days", text: "Last 7 days" },
+				{ id: "t14days", text: "Last 14 days" },
+				{ id: "t30days", text: "Last 30 days" },
+				{ id: "t60days", text: "Last 60 days" },
+				{ id: "t90days", text: "Last 90 days" },
+				{ id: "t1year", text: "Last year" },
+				{ id: "all", text: "All pull requests" },
+			];
+		}
+
+		const pullRequestCreators = this.getPullRequestCreators(this.filteredPullRequests);
+		const pullRequestRepositories = this.getPullRequestRepositories(this.filteredPullRequests);
+		const pullRequestFinalReviewers = this.getPullRequestFinalReviewers(this.filteredPullRequests);
+		const pullRequestTotalReviewers = this.getPullRequestTotalReviewers(this.filteredPullRequests);
+		const pullRequestCloseTimes = this.getPullRequestCloseTimes(this.filteredPullRequests);
 
 		return (
 			<Card className="pull-requests-stats"
-				titleProps={{ text: `Stats for ${this.typedPullRequests.length} pull requests`, ariaLevel: 2 }}>
+				titleProps={{ text: `Stats for ${this.filteredPullRequests.length} pull requests`, ariaLevel: 2 }}>
+				<div>
+					<p>Filter stats by the following. <strong>Last X days</strong> filters are based upon creation date.</p>
+					<Dropdown
+						ariaLabel="Select a filter"
+						placeholder="Select a filter"
+						items={filterOptions()}
+						selection={this.filterSelection}
+						onSelect={this.handleFilterSelection}
+						dismissOnSelect={true}
+						/>
+				</div>
 				<section className="stat-blocks">
 					<section>
 						<h3>Authors</h3>
@@ -194,7 +277,8 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		const gitClient = getClient(GitRestClient) as CustomExtendedGitRestClient;
 
 		// Number of pull requests to pull from the API at once.
-		const pullRequestsToPullAtOnce = 250;
+		let pullRequestsToPullAtOnce = 250;
+
 		let allPullRequests = await gitClient.getPullRequestsByProject(projectId, { status: PullRequestStatus.All }, undefined, undefined, pullRequestsToPullAtOnce);
 
 		if (!allPullRequests) {
@@ -202,7 +286,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		} else {
 			if (allPullRequests.length === pullRequestsToPullAtOnce) {
 				// Set this to false for faster development. Otherwise set to true to pull all pull requests.
-				let getMorePrs = false;
+				let getMorePrs = true;
 				let additionalPullRequests: GitPullRequest[] = [];
 				while (getMorePrs) {
 					additionalPullRequests = await gitClient.getPullRequestsByProject(projectId, { status: PullRequestStatus.All }, undefined, allPullRequests.length, pullRequestsToPullAtOnce);
@@ -295,6 +379,21 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 			}
 		});
 		return map;
+	}
+
+	private handleFilterSelection = (_events: React.SyntheticEvent<HTMLElement>, item: IListBoxItem<{}>): void => {
+		this.setState({
+			selectedFilterId: item.id
+		});
+		this.setState({
+			selectedFilterText: item.text ?? ''
+		});
+
+		this.setState({ creatorPullRequests: [] });
+		this.setState({ repositoryPullRequests: [] });
+		this.setState({ finalReviewerPullRequests: [] });
+		this.setState({ totalReviewerPullRequests: [] });
+		this.setState({ closeTimePullRequests: [] });
 	}
 
 	private showToast = async (message: string): Promise<void> => {
