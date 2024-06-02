@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "pull-request-stats",
     "publisher": "JamesSkemp",
-    "version": "0.0.98",
+    "version": "0.0.99",
     "name": "Pull Request Stats",
     "description": "Azure DevOps Extension",
     "categories": [
