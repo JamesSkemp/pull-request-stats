@@ -5,6 +5,7 @@ import { IPullRequest } from "./HubInterfaces";
 import { getTypedPullRequest } from "./HubUtil";
 import { GitPullRequest } from "azure-devops-extension-api/Git";
 import { VoteDisplay } from "./VoteDisplay";
+import { Icon } from "azure-devops-ui/Icon";
 
 export interface PullRequestsListingProps {
 	pullRequests: GitPullRequest[];
@@ -51,7 +52,7 @@ export class PullRequestsListing extends React.Component<PullRequestsListingProp
 						</div>
 					</div>
 					Created {pr.creationDate.toLocaleString()} by <span className="creator"><img src={pr.createdByImageUrl} alt="" /> {pr.createdByDisplayName}</span><br />
-					{pr.sourceRefName} into {pr.targetRefName}<br />
+					<Icon iconName="OpenSource" /> {pr.sourceRefName.replace('refs/heads/', '')} into <Icon iconName="GitGraph" /> {pr.targetRefName.replace('refs/heads/', '')}<br />
 					Open for {diffTime} milliseconds / {diffHours} hours / {diffDays} days.<br />
 					{pr.reviewers.map(r => {
 						return <span className="reviewer"><VoteDisplay vote={r.vote} /> <img src={r.imageUrl} alt="" /> {r.displayName} {r.hasDeclined} {r.isFlagged}</span>;
