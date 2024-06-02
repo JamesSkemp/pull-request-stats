@@ -24,13 +24,13 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 		if (mergeStatus == PullRequestStatus.Abandoned) {
 			return (
 				<React.Fragment>
-					Abandoned {closedDate.toLocaleString()}<br />
+					<div className="pr-status pr-status-abandoned"><div>Abandoned</div></div> {closedDate.toLocaleString()}<br />
 				</React.Fragment>
 			);
 		}
 		return (
 			<React.Fragment>
-				Completed {closedDate.toLocaleString()}<br />
+				<div className="pr-status pr-status-completed"><div>Completed</div></div> {closedDate.toLocaleString()}<br />
 			</React.Fragment>
 		);
 	}
