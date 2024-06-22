@@ -110,6 +110,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 				break;
 		}
 
+		// eslint-disable-next-line @typescript-eslint/ban-types
 		function filterOptions(): Array<IListBoxItem<{}>> {
 			return [
 				{ id: "c100", text: "Last 100 pull requests" },
@@ -150,13 +151,16 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<h3>Authors</h3>
 						<p>This tracks who created pull requests.</p>
-						<div>
+						<div className="user-listing">
 							{[...pullRequestCreators.keys()].sort((a, b) => a.localeCompare(b)).map(prc => {
 								const creator = pullRequestCreators.get(prc);
 								if (creator) {
 									return (
-										<div>
-											<img src={creator[0].createdByImageUrl} alt="" /> <span onClick={() => this.setState({ creatorPullRequests: creator! })}>{creator[0].createdByDisplayName}</span> = {creator.length}
+										<div key={creator[0].createdById}>
+											<img src={creator[0].createdByImageUrl} alt="" />
+											<div>
+												<span className="more-link" onClick={() => this.setState({ creatorPullRequests: creator! })}>{creator[0].createdByDisplayName}</span> <span>{creator.length}</span>
+											</div>
 										</div>
 									);
 								} else {
@@ -175,8 +179,8 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 								const repository = pullRequestRepositories.get(repo);
 								if (repository) {
 									return (
-										<div>
-											<span onClick={() => this.setState({ repositoryPullRequests: repository! })}>{repository[0].repositoryName}</span> = {repository.length}
+										<div key={repository[0].repositoryId}>
+											<span className="more-link" onClick={() => this.setState({ repositoryPullRequests: repository! })}>{repository[0].repositoryName}</span> = {repository.length}
 										</div>
 									);
 								} else {
@@ -191,13 +195,16 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<h3>Final Reviewers</h3>
 						<p>This tracks how often an individual voted on a closed pull request. This does not track if they ever voted on it, only if they had voted when it was closed.</p>
-						<div>
+						<div className="user-listing">
 							{[...pullRequestFinalReviewers.keys()].sort((a, b) => a.localeCompare(b)).map(reviewer => {
 								const prs = pullRequestFinalReviewers.get(reviewer);
 								if (prs) {
 									return (
-										<div>
-											<img src={prs[0].createdByImageUrl} alt="" /> <span onClick={() => this.setState({ finalReviewerPullRequests: prs! })}>{reviewer}</span> = {prs.length}
+										<div key={reviewer}>
+											<img src={prs[0].reviewers.find(r => r.displayName === reviewer)!.imageUrl} alt="" />
+											<div>
+												<span className="more-link" onClick={() => this.setState({ finalReviewerPullRequests: prs! })}>{reviewer}</span> <span>{prs.length}</span>
+											</div>
 										</div>
 									);
 								} else {
@@ -217,8 +224,8 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 								const count = pullRequestTotalReviewers.get(reviewerCount);
 								if (count) {
 									return (
-										<div>
-											<span onClick={() => this.setState({ totalReviewerPullRequests: count! })}>{reviewerCount} reviewers</span> = {count.length}
+										<div key={reviewerCount}>
+											<span className="more-link" onClick={() => this.setState({ totalReviewerPullRequests: count! })}>{reviewerCount} reviewers</span> = {count.length}
 										</div>
 									);
 								} else {
@@ -239,14 +246,14 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 								if (closeTimes) {
 									if (closeTime >= 1) {
 										return (
-											<div>
-												<span onClick={() => this.setState({ closeTimePullRequests: closeTimes! })}>&lt; {closeTime} day(s)</span> = {closeTimes.length}
+											<div key={closeTime}>
+												<span className="more-link" onClick={() => this.setState({ closeTimePullRequests: closeTimes! })}>&lt; {closeTime} day(s)</span> = {closeTimes.length}
 											</div>
 										);
 									} else {
 										return (
-											<div>
-												<span onClick={() => this.setState({ closeTimePullRequests: closeTimes! })}>&lt; {Math.floor(closeTime * 100)} hour(s)</span> = {closeTimes.length}
+											<div key={closeTime}>
+												<span className="more-link" onClick={() => this.setState({ closeTimePullRequests: closeTimes! })}>&lt; {Math.floor(closeTime * 100)} hour(s)</span> = {closeTimes.length}
 											</div>
 										);
 									}
@@ -381,6 +388,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		return map;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	private handleFilterSelection = (_events: React.SyntheticEvent<HTMLElement>, item: IListBoxItem<{}>): void => {
 		this.setState({
 			selectedFilterId: item.id

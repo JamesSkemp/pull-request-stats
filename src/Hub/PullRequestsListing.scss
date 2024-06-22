@@ -17,14 +17,16 @@
 		white-space: nowrap;
 
 		&.pr-status-active {
-			background-color: rgba(0, 120, 212, 1);
-			color: rgba(255, 255, 255, 1);
+			background-color: rgb(0 120 212 / 100%);
+			color: rgb(255 255 255 / 100%);
 		}
+
 		&.pr-status-draft {
 			background-color: transparent;
-			border: 1px solid rgba(0, 90, 158, 1);
-			color: rgba(0, 90, 158, 1);
+			border: 1px solid rgb(0 90 158 / 100%);
+			color: rgb(0 90 158 / 100%);
 		}
+
 		&>div {
 			display: inline;
 			margin: 0 .5rem;
@@ -36,6 +38,7 @@
 		display: inline-block;
 
 		&>img {
+			border-radius: 16px;
 			height: 16px;
 		}
 	}
@@ -45,6 +48,7 @@
 		margin-right: 1em;
 
 		&>img {
+			border-radius: 16px;
 			height: 16px;
 		}
 	}

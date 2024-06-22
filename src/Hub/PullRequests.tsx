@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import * as React from "react";
 import "./PullRequests.scss";
 import { IPullRequest } from "./HubInterfaces";
@@ -48,13 +49,13 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 
 		const pullRequestsDisplay = this.typedPullRequests.map(pr => {
 			return (
-				<div>
+				<div key={pr.pullRequestId}>
 					<a href={pr.url.replace('_apis/git/repositories', '_git').replace('/pullRequests/', '/pullrequest/')} target="_blank">{pr.title}</a> ({pr.repositoryName})<br />
 					Created {pr.creationDate.toLocaleString()} by <span className="creator"><img src={pr.createdByImageUrl} alt="" /> {pr.createdByDisplayName}</span><br />
 					{this.getClosedDateDisplay(pr.closedDate, pr.status)}
-					<Icon iconName="OpenSource" /> {pr.sourceRefName.replace('refs/heads/', '')} into <Icon iconName="GitGraph" /> {pr.targetRefName.replace('refs/heads/', '')}<br />
+					<span><Icon iconName="OpenSource" /> {pr.sourceRefName.replace('refs/heads/', '')} into <Icon iconName="GitGraph" /> {pr.targetRefName.replace('refs/heads/', '')}</span><br />
 					{pr.reviewers.map(r => {
-						return <span className="reviewer"><VoteDisplay vote={r.vote} /> <img src={r.imageUrl} alt="" /> {r.displayName} {r.hasDeclined} {r.isFlagged}</span>;
+						return <span className="reviewer" key={r.id}><VoteDisplay vote={r.vote} /> <img src={r.imageUrl} alt="" /> {r.displayName} {r.hasDeclined} {r.isFlagged}</span>;
 					})}
 				</div>
 			)

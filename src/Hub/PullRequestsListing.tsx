@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import * as React from "react";
 import "./PullRequestsListing.scss";
 import { Card } from "azure-devops-ui/Card";
@@ -44,7 +45,7 @@ export class PullRequestsListing extends React.Component<PullRequestsListingProp
 			const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 			const statusClass = pr.isDraft ? 'pr-status-draft' : 'pr-status-active';
 			return (
-				<div>
+				<div key={pr.pullRequestId}>
 					<a href={pr.url.replace('_apis/git/repositories', '_git').replace('/pullRequests/', '/pullrequest/')} target="_blank">{pr.title}</a> ({pr.repositoryName})<br />
 					<div className={statusClass + ' pr-status'}>
 						<div>
@@ -55,7 +56,7 @@ export class PullRequestsListing extends React.Component<PullRequestsListingProp
 					<Icon iconName="OpenSource" /> {pr.sourceRefName.replace('refs/heads/', '')} into <Icon iconName="GitGraph" /> {pr.targetRefName.replace('refs/heads/', '')}<br />
 					Open for {diffHours} hours / {diffDays} days.<br />
 					{pr.reviewers.map(r => {
-						return <span className="reviewer"><VoteDisplay vote={r.vote} /> <img src={r.imageUrl} alt="" /> {r.displayName} {r.hasDeclined} {r.isFlagged}</span>;
+						return <span key={r.id} className="reviewer"><VoteDisplay vote={r.vote} /> <img src={r.imageUrl} alt="" /> {r.displayName} {r.hasDeclined} {r.isFlagged}</span>;
 					})}
 				</div>
 			);

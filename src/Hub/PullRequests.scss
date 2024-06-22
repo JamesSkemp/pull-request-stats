@@ -10,6 +10,7 @@ section.pull-requests {
 		display: inline-block;
 
 		&>img {
+			border-radius: 16px;
 			height: 16px;
 		}
 	}
@@ -23,13 +24,15 @@ section.pull-requests {
 		white-space: nowrap;
 
 		&.pr-status-abandoned {
-			background-color: rgba(214, 127, 60, 1);
-			color: rgba(255, 255, 255, 1);
+			background-color: rgb(214 127 60 / 100%);
+			color: rgb(255 255 255 / 100%);
 		}
+
 		&.pr-status-completed {
-			background-color: rgba(85, 163, 98, 1);
-			color: rgba(255, 255, 255, 1);
+			background-color: rgb(85 163 98 / 100%);
+			color: rgb(255 255 255 / 100%);
 		}
+
 		&>div {
 			display: inline;
 			margin: 0 .5rem;
@@ -42,6 +45,7 @@ section.pull-requests {
 		margin-right: .5em;
 
 		&>img {
+			border-radius: 16px;
 			height: 16px;
 		}
 	}
