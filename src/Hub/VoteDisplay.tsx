@@ -17,7 +17,7 @@ export function VoteDisplay(props: VoteDisplayProps): JSX.Element {
 	switch (vote) {
 		case 0:
 			return (
-				<svg className={'vote-' + vote} height="16" role="img" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><desc>No review yet</desc><circle cx="8" cy="8" r="7" fill="#fff"></circle><path fill-rule="evenodd" clip-rule="evenodd" d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm0-1.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z"></path></svg>
+				<svg className={'vote-' + vote} height="16" role="img" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><desc>No review yet</desc><circle cx="8" cy="8" r="7" fill="#fff"></circle><path fillRule="evenodd" clipRule="evenodd" d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm0-1.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z"></path></svg>
 			);
 		case 5:
 			return (
