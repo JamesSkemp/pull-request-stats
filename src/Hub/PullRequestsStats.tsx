@@ -152,7 +152,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						<p>This tracks who created pull requests.</p>
 						<div>
 							{[...pullRequestCreators.keys()].sort((a, b) => a.localeCompare(b)).map(prc => {
-								let creator = pullRequestCreators.get(prc);
+								const creator = pullRequestCreators.get(prc);
 								if (creator) {
 									return (
 										<div>
@@ -172,7 +172,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						<h3>Repositories</h3>
 						<div>
 							{[...pullRequestRepositories.keys()].map(repo => {
-								let repository = pullRequestRepositories.get(repo);
+								const repository = pullRequestRepositories.get(repo);
 								if (repository) {
 									return (
 										<div>
@@ -193,11 +193,11 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						<p>This tracks how often an individual voted on a closed pull request. This does not track if they ever voted on it, only if they had voted when it was closed.</p>
 						<div>
 							{[...pullRequestFinalReviewers.keys()].sort((a, b) => a.localeCompare(b)).map(reviewer => {
-								let prs = pullRequestFinalReviewers.get(reviewer);
+								const prs = pullRequestFinalReviewers.get(reviewer);
 								if (prs) {
 									return (
 										<div>
-											<span onClick={() => this.setState({ finalReviewerPullRequests: prs! })}>{reviewer}</span> = {prs.length}
+											<img src={prs[0].createdByImageUrl} alt="" /> <span onClick={() => this.setState({ finalReviewerPullRequests: prs! })}>{reviewer}</span> = {prs.length}
 										</div>
 									);
 								} else {
@@ -214,7 +214,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						<p>This tracks the number of reviewers who were marked as voting on a closed pull request, when it was closed.</p>
 						<div>
 							{[...pullRequestTotalReviewers.keys()].sort((a, b) => a - b).map(reviewerCount => {
-								let count = pullRequestTotalReviewers.get(reviewerCount);
+								const count = pullRequestTotalReviewers.get(reviewerCount);
 								if (count) {
 									return (
 										<div>
@@ -235,7 +235,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						<p>This tracks the amount of time a pull request was open before it was closed. Times are rounded down.</p>
 						<div>
 							{[...pullRequestCloseTimes.keys()].sort((a, b) => a - b).map(closeTime => {
-								let closeTimes = pullRequestCloseTimes.get(closeTime);
+								const closeTimes = pullRequestCloseTimes.get(closeTime);
 								if (closeTimes) {
 									if (closeTime >= 1) {
 										return (
@@ -277,9 +277,9 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		const gitClient = getClient(GitRestClient) as CustomExtendedGitRestClient;
 
 		// Number of pull requests to pull from the API at once.
-		let pullRequestsToPullAtOnce = 250;
+		const pullRequestsToPullAtOnce = 250;
 
-		let allPullRequests = await gitClient.getPullRequestsByProject(projectId, { status: PullRequestStatus.All }, undefined, undefined, pullRequestsToPullAtOnce);
+		const allPullRequests = await gitClient.getPullRequestsByProject(projectId, { status: PullRequestStatus.All }, undefined, undefined, pullRequestsToPullAtOnce);
 
 		if (!allPullRequests) {
 			this.showToast('No pull requests found for this project.');
