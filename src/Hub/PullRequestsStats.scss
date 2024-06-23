@@ -10,6 +10,7 @@
 		display: grid;
 		gap: 1em;
 		grid-template-columns: repeat(2, 45vw);
+		min-height: 95vh;
 	}
 
 	.more-link:hover {

@@ -11,6 +11,7 @@ import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, getClient } fro
 import { Dropdown } from "azure-devops-ui/Dropdown";
 import { IListBoxItem } from "azure-devops-ui/ListBox";
 import { ListSelection } from "azure-devops-ui/List";
+import { Tab, TabBar } from "azure-devops-ui/Tabs";
 
 export interface PullRequestsStatsProps {
 	project: IProjectInfo | undefined;
@@ -25,6 +26,7 @@ interface IPullRequestsStatsState {
 	closeTimePullRequests: IPullRequest[];
 	selectedFilterId: string;
 	selectedFilterText: string;
+	selectedTabId: string;
 }
 
 export class PullRequestsStats extends React.Component<PullRequestsStatsProps, IPullRequestsStatsState> {
@@ -43,7 +45,8 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 			totalReviewerPullRequests: [],
 			closeTimePullRequests: [],
 			selectedFilterId: '',
-			selectedFilterText: ''
+			selectedFilterText: '',
+			selectedTabId: 'authors'
 		}
 	}
 
@@ -53,6 +56,8 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 	}
 
 	public render(): JSX.Element | null {
+		const { selectedTabId } = this.state;
+
 		if (this.state.pullRequests.length) {
 			this.typedPullRequests = this.state.pullRequests.map(pr => getTypedPullRequest(pr));
 		} else {
@@ -127,12 +132,6 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 			];
 		}
 
-		const pullRequestCreators = this.getPullRequestCreators(this.filteredPullRequests);
-		const pullRequestRepositories = this.getPullRequestRepositories(this.filteredPullRequests);
-		const pullRequestFinalReviewers = this.getPullRequestFinalReviewers(this.filteredPullRequests);
-		const pullRequestTotalReviewers = this.getPullRequestTotalReviewers(this.filteredPullRequests);
-		const pullRequestCloseTimes = this.getPullRequestCloseTimes(this.filteredPullRequests);
-
 		return (
 			<Card className="pull-requests-stats"
 				titleProps={{ text: `Stats for ${this.filteredPullRequests.length} pull requests`, ariaLevel: 2 }}>
@@ -147,6 +146,34 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						dismissOnSelect={true}
 						/>
 				</div>
+				<div>
+					<TabBar
+						onSelectedTabChanged={this.onSelectedTabChanged}
+						selectedTabId={selectedTabId}>
+						<Tab name="Authors" id="authors" />
+						<Tab name="Repositories" id="repositories" />
+						<Tab name="Reviewers" id="reviewers" />
+						<Tab name="Total Reviewers" id="reviewers-total" />
+						<Tab name="Close Times" id="close-times" />
+					</TabBar>
+
+					{ this.getTabContent() }
+				</div>
+			</Card>
+		);
+	}
+
+	private onSelectedTabChanged = (newTabId: string) => {
+		this.setState({
+			selectedTabId: newTabId
+		});
+	}
+
+	private getTabContent() : JSX.Element | null {
+		const { selectedTabId } = this.state;
+		if (selectedTabId === 'authors') {
+			const pullRequestCreators = this.getPullRequestCreators(this.filteredPullRequests);
+			return (
 				<section className="stat-blocks">
 					<section>
 						<h3>Authors</h3>
@@ -172,6 +199,12 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<PullRequests pullRequests={this.state.creatorPullRequests} heading="Author Pull Requests"></PullRequests>
 					</section>
+				</section>
+			);
+		} else if (selectedTabId === 'repositories') {
+			const pullRequestRepositories = this.getPullRequestRepositories(this.filteredPullRequests);
+			return (
+				<section className="stat-blocks">
 					<section>
 						<h3>Repositories</h3>
 						<div>
@@ -192,6 +225,12 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<PullRequests pullRequests={this.state.repositoryPullRequests} heading="Repository Pull Requests"></PullRequests>
 					</section>
+				</section>
+			);
+		} else if (selectedTabId === 'reviewers') {
+			const pullRequestFinalReviewers = this.getPullRequestFinalReviewers(this.filteredPullRequests);
+			return (
+				<section className="stat-blocks">
 					<section>
 						<h3>Final Reviewers</h3>
 						<p>This tracks how often an individual voted on a closed pull request. This does not track if they ever voted on it, only if they had voted when it was closed.</p>
@@ -216,6 +255,12 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<PullRequests pullRequests={this.state.finalReviewerPullRequests} heading="Final Reviewer Pull Requests"></PullRequests>
 					</section>
+				</section>
+			);
+		} else if (selectedTabId === 'reviewers-total') {
+			const pullRequestTotalReviewers = this.getPullRequestTotalReviewers(this.filteredPullRequests);
+			return (
+				<section className="stat-blocks">
 					<section>
 						<h3>Total Reviewers</h3>
 						<p>This tracks the number of reviewers who were marked as voting on a closed pull request, when it was closed.</p>
@@ -237,6 +282,12 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<PullRequests pullRequests={this.state.totalReviewerPullRequests} heading="Total Reviewer Pull Requests"></PullRequests>
 					</section>
+				</section>
+			);
+		} else if (selectedTabId === 'close-times') {
+			const pullRequestCloseTimes = this.getPullRequestCloseTimes(this.filteredPullRequests);
+			return (
+				<section className="stat-blocks">
 					<section>
 						<h3>Close Time</h3>
 						<p>This tracks the amount of time a pull request was open before it was closed. Times are rounded down.</p>
@@ -267,8 +318,10 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						<PullRequests pullRequests={this.state.closeTimePullRequests} heading="Close Time Pull Requests"></PullRequests>
 					</section>
 				</section>
-			</Card>
-		);
+			);
+		} else {
+			return null;
+		}
 	}
 
 	private async getPullRequests() {
