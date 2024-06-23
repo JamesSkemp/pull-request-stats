@@ -178,7 +178,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<h3>Authors</h3>
 						<p>This tracks who created pull requests.</p>
-						<div className="user-listing">
+						<div className="user-listing stat-listing">
 							{[...pullRequestCreators.keys()].sort((a, b) => a.localeCompare(b)).map(prc => {
 								const creator = pullRequestCreators.get(prc);
 								if (creator) {
@@ -207,7 +207,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 				<section className="stat-blocks">
 					<section>
 						<h3>Repositories</h3>
-						<div>
+						<div className="stat-listing">
 							{[...pullRequestRepositories.keys()].map(repo => {
 								const repository = pullRequestRepositories.get(repo);
 								if (repository) {
@@ -234,7 +234,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<h3>Final Reviewers</h3>
 						<p>This tracks how often an individual voted on a closed pull request. This does not track if they ever voted on it, only if they had voted when it was closed.</p>
-						<div className="user-listing">
+						<div className="user-listing stat-listing">
 							{[...pullRequestFinalReviewers.keys()].sort((a, b) => a.localeCompare(b)).map(reviewer => {
 								const prs = pullRequestFinalReviewers.get(reviewer);
 								if (prs) {
@@ -264,7 +264,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<h3>Total Reviewers</h3>
 						<p>This tracks the number of reviewers who were marked as voting on a closed pull request, when it was closed.</p>
-						<div>
+						<div className="stat-listing">
 							{[...pullRequestTotalReviewers.keys()].sort((a, b) => a - b).map(reviewerCount => {
 								const count = pullRequestTotalReviewers.get(reviewerCount);
 								if (count) {
@@ -291,7 +291,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					<section>
 						<h3>Close Time</h3>
 						<p>This tracks the amount of time a pull request was open before it was closed. Times are rounded down.</p>
-						<div>
+						<div className="stat-listing">
 							{[...pullRequestCloseTimes.keys()].sort((a, b) => a - b).map(closeTime => {
 								const closeTimes = pullRequestCloseTimes.get(closeTime);
 								if (closeTimes) {

@@ -17,11 +17,16 @@
 		cursor: pointer;
 	}
 
+	.stat-listing {
+		&>div {
+			padding-bottom: .5em;
+		}
+	}
+
 	.user-listing {
 		&>div {
 			display: grid;
 			grid-template-columns: 35px auto;
-			padding-bottom: .5em;
 
 			div>span:nth-child(2)::before {
 				content: ' = ';
