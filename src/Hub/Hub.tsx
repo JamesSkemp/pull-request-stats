@@ -60,7 +60,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
 		this.setState({ project: this.project });
 
 		const gitClient = getClient(GitRestClient) as CustomExtendedGitRestClient;
-		let openPullRequests = await gitClient.getPullRequestsByProject(this.project.id);
+		const openPullRequests = await gitClient.getPullRequestsByProject(this.project.id);
 
 		if (!openPullRequests) {
 			this.showToast('No open pull requests found for this project.');
