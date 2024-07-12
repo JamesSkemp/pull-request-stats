@@ -65,7 +65,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		}
 
 		if (!this.typedPullRequests.length) {
-			return null;
+			return (<div className="loader-container"><div className="loader"></div><div>Loading Data</div></div>);
 		}
 
 		const currentDate = new Date();
