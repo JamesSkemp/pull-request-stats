@@ -18,8 +18,23 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 		super(props);
 	}
 
-	getClosedDateDisplay(closedDate: Date | undefined, mergeStatus: PullRequestStatus): JSX.Element | null {
-		if (!closedDate) {
+	getClosedDateDisplay(pullRequest: IPullRequest): JSX.Element | null {
+		const closedDate = pullRequest.closedDate;
+		const mergeStatus = pullRequest.status;
+
+		if (pullRequest.isDraft) {
+			return (
+				<React.Fragment>
+					<div className="pr-status pr-status-draft"><div>Draft</div></div><br />
+				</React.Fragment>
+			);
+		} else if (mergeStatus === PullRequestStatus.Active) {
+			return (
+				<React.Fragment>
+					<div className="pr-status pr-status-active"><div>Active</div></div><br />
+				</React.Fragment>
+			);
+		} else if (!closedDate) {
 			return null;
 		}
 		if (mergeStatus == PullRequestStatus.Abandoned) {
@@ -52,7 +67,7 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 				<div key={pr.pullRequestId}>
 					<a href={pr.url.replace('_apis/git/repositories', '_git').replace('/pullRequests/', '/pullrequest/')} target="_blank">{pr.title}</a> ({pr.repositoryName})<br />
 					Created {pr.creationDate.toLocaleString()} by <span className="creator"><img src={pr.createdByImageUrl} alt="" /> {pr.createdByDisplayName}</span><br />
-					{this.getClosedDateDisplay(pr.closedDate, pr.status)}
+					{this.getClosedDateDisplay(pr)}
 					<span><Icon iconName="OpenSource" /> {pr.sourceRefName.replace('refs/heads/', '')} into <Icon iconName="GitGraph" /> {pr.targetRefName.replace('refs/heads/', '')}</span><br />
 					{pr.reviewers.map(r => {
 						return <span className="reviewer" key={r.id}><VoteDisplay vote={r.vote} /> <img src={r.imageUrl} alt="" /> {r.displayName} {r.hasDeclined} {r.isFlagged}</span>;

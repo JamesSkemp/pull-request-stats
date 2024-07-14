@@ -27,6 +27,7 @@
 			color: rgb(0 90 158 / 100%);
 		}
 
+		/* stylelint-disable-next-line no-descending-specificity */
 		&>div {
 			display: inline;
 			margin: 0 .5rem;
@@ -47,6 +48,7 @@
 		display: inline-block;
 		margin-right: 1em;
 
+		/* stylelint-disable-next-line no-descending-specificity */
 		&>img {
 			border-radius: 16px;
 			height: 16px;
