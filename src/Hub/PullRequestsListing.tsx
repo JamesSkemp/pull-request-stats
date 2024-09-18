@@ -10,6 +10,7 @@ import { Icon } from "azure-devops-ui/Icon";
 
 export interface PullRequestsListingProps {
 	pullRequests: GitPullRequest[];
+	refreshFn: () => void;
 	title: string;
 }
 
@@ -65,8 +66,11 @@ export class PullRequestsListing extends React.Component<PullRequestsListingProp
 		return (
 			<Card className="pull-request-listing"
 				titleProps={{ text: this.props.title, ariaLevel: 2 }}>
-				<section>
-					{pullRequestsDisplay}
+				<section className="open-pull-requests">
+					<Icon iconName="Refresh" onClick={ () => this.props.refreshFn() } />
+					<section>
+						{pullRequestsDisplay}
+					</section>
 				</section>
 			</Card>
 		);

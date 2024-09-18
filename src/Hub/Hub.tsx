@@ -41,10 +41,17 @@ class HubContent extends React.Component<{}, IHubContentState> {
 			<Page className="pull-request-stats flex-grow">
 				<Header title="Pull Request Stats" />
 				{this.state.project && <h2>Pull Requests for {this.state.project.name}</h2>}
-				<PullRequestsListing pullRequests={this.state.openPullRequests} title="Open Pull Requests" />
+				<PullRequestsListing pullRequests={this.state.openPullRequests} refreshFn={ this.refreshOpen } title="Open Pull Requests" />
 				{this.state.project && <PullRequestsStats project={this.state.project} />}
 			</Page>
 		);
+	}
+
+	refreshOpen = () => {
+		if (this.state.project) {
+			this.showToast('Checking for updated open pull requests.');
+			this.getPullRequests();
+		}
 	}
 
 	private async getCustomData() {
@@ -58,9 +65,12 @@ class HubContent extends React.Component<{}, IHubContentState> {
 			return;
 		}
 		this.setState({ project: this.project });
+		this.getPullRequests();
+	}
 
+	private async getPullRequests() {
 		const gitClient = getClient(GitRestClient) as CustomExtendedGitRestClient;
-		const openPullRequests = await gitClient.getPullRequestsByProject(this.project.id);
+		const openPullRequests = await gitClient.getPullRequestsByProject(this.state.project!.id);
 
 		if (!openPullRequests) {
 			this.showToast('No open pull requests found for this project.');
