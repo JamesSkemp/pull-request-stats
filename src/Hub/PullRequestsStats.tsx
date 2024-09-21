@@ -7,14 +7,21 @@ import { Card } from "azure-devops-ui/Card";
 import { getTypedPullRequest } from "./HubUtil";
 import { PullRequests } from "./PullRequests";
 import { CustomExtendedGitRestClient } from "../custom-typings";
-import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, getClient } from "azure-devops-extension-api";
+import { CommonServiceIds, IExtensionDataService, IGlobalMessagesService, IProjectInfo, getClient } from "azure-devops-extension-api";
 import { Dropdown } from "azure-devops-ui/Dropdown";
 import { IListBoxItem } from "azure-devops-ui/ListBox";
 import { ListSelection } from "azure-devops-ui/List";
 import { Tab, TabBar } from "azure-devops-ui/Tabs";
+import { Toggle } from "azure-devops-ui/Toggle";
+import { ObservableValue } from "azure-devops-ui/Core/Observable";
 
 export interface PullRequestsStatsProps {
 	project: IProjectInfo | undefined;
+}
+
+interface IPullRequestsStatsSettings {
+	excludeDraft: boolean;
+	excludeAbandoned: boolean;
 }
 
 interface IPullRequestsStatsState {
@@ -27,12 +34,16 @@ interface IPullRequestsStatsState {
 	selectedFilterId: string;
 	selectedFilterText: string;
 	selectedTabId: string;
+	settings: IPullRequestsStatsSettings;
 }
 
 export class PullRequestsStats extends React.Component<PullRequestsStatsProps, IPullRequestsStatsState> {
 	private typedPullRequests: IPullRequest[] = [];
 	private filteredPullRequests: IPullRequest[] = [];
 	private filterSelection = new ListSelection();
+
+	private excludeAbandonedToggle = new ObservableValue<boolean>(false);
+	private excludeDraftToggle = new ObservableValue<boolean>(false);
 
 	constructor(props: PullRequestsStatsProps) {
 		super(props);
@@ -46,12 +57,14 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 			closeTimePullRequests: [],
 			selectedFilterId: '',
 			selectedFilterText: '',
-			selectedTabId: 'authors'
+			selectedTabId: 'authors',
+			settings: { excludeAbandoned: false, excludeDraft: false }
 		}
 	}
 
 	public componentDidMount(): void {
 		SDK.init();
+		this.loadSettings();
 		this.getPullRequests();
 	}
 
@@ -66,6 +79,13 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 
 		if (!this.typedPullRequests.length) {
 			return (<div className="loader-container"><div className="loader"></div><div>Loading Data</div></div>);
+		}
+
+		if (this.state.settings.excludeAbandoned) {
+			this.typedPullRequests = this.typedPullRequests.filter(pr => pr.status !== PullRequestStatus.Abandoned);
+		}
+		if (this.state.settings.excludeDraft) {
+			this.typedPullRequests = this.typedPullRequests.filter(pr => !pr.isDraft);
 		}
 
 		const currentDate = new Date();
@@ -155,6 +175,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						<Tab name="Reviewers" id="reviewers" />
 						<Tab name="Total Reviewers" id="reviewers-total" />
 						<Tab name="Close Times" id="close-times" />
+						<Tab name="Settings" id="settings" />
 					</TabBar>
 
 					{ this.getTabContent() }
@@ -319,6 +340,31 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 					</section>
 				</section>
 			);
+		} else if (selectedTabId === 'settings') {
+			return (
+				<section className="stat-blocks">
+					<section>
+						<h3>Settings</h3>
+						<div className="stat-settings">
+							<p>Would you like to include abandoned pull requests?</p>
+							<Toggle
+								offText="Including Abandoned Pull Requests"
+								onText="Excluding Abandoned Pull Requests"
+								checked={this.excludeAbandonedToggle}
+								onChange={(_event, value) => {this.excludeAbandonedToggle.value = value; this.updateSettings();}}
+							/>
+
+							<p>Would you like to include draft pull requests?</p>
+							<Toggle
+								offText="Including Draft Pull Requests"
+								onText="Excluding Draft Pull Requests"
+								checked={this.excludeDraftToggle}
+								onChange={(_event, value) => {this.excludeDraftToggle.value = value; this.updateSettings();}}
+							/>
+						</div>
+					</section>
+				</section>
+			);
 		} else {
 			return null;
 		}
@@ -455,6 +501,51 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 		this.setState({ finalReviewerPullRequests: [] });
 		this.setState({ totalReviewerPullRequests: [] });
 		this.setState({ closeTimePullRequests: [] });
+	}
+
+	private async loadSettings(): Promise<void> {
+		await SDK.ready();
+		const accessToken = await SDK.getAccessToken();
+		const extDataService = await SDK.getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
+		const dataManager = await extDataService.getExtensionDataManager(SDK.getExtensionContext().id, accessToken);
+
+		await dataManager.getValue<string>("pullRequestsStats" + this.props.project?.id, {scopeType: "User"}).then((data) => {
+			if (data) {
+				const savedData: IPullRequestsStatsSettings = JSON.parse(data);
+
+				if (savedData) {
+					this.excludeAbandonedToggle.value = savedData.excludeAbandoned;
+					this.excludeDraftToggle.value = savedData.excludeDraft;
+					this.setState({ settings: savedData });
+				}
+			}
+		}, () => {
+			// It's fine if no saved data is found.
+		});
+	}
+
+	private async updateSettings(): Promise<void> {
+		const settings = this.state.settings;
+		if (settings.excludeAbandoned !== this.excludeAbandonedToggle.value) {
+			settings.excludeAbandoned = this.excludeAbandonedToggle.value;
+		}
+		if (settings.excludeDraft !== this.excludeDraftToggle.value) {
+			settings.excludeDraft = this.excludeDraftToggle.value;
+		}
+		this.setState({ settings: settings });
+		this.saveSettings();
+	}
+
+	private async saveSettings(): Promise<void> {
+		await SDK.ready();
+		const accessToken = await SDK.getAccessToken();
+		const extDataService = await SDK.getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
+		const dataManager = await extDataService.getExtensionDataManager(SDK.getExtensionContext().id, accessToken);
+		await dataManager.setValue("pullRequestsStats" + this.props.project?.id, JSON.stringify(this.state.settings), {scopeType: "User"}).then(() => {
+			// No need to return anything.
+			this.showToast('Settings have been saved.');
+		});
+
 	}
 
 	private showToast = async (message: string): Promise<void> => {
