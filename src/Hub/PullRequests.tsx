@@ -22,7 +22,13 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 		const closedDate = pullRequest.closedDate;
 		const mergeStatus = pullRequest.status;
 
-		if (pullRequest.isDraft) {
+		if (mergeStatus == PullRequestStatus.Abandoned) {
+			return (
+				<React.Fragment>
+					<div className="pr-status pr-status-abandoned"><div>Abandoned</div></div> {closedDate ? closedDate.toLocaleString() : ''}<br />
+				</React.Fragment>
+			);
+		} else if (pullRequest.isDraft) {
 			return (
 				<React.Fragment>
 					<div className="pr-status pr-status-draft"><div>Draft</div></div><br />
@@ -36,13 +42,6 @@ export class PullRequests extends React.Component<PullRequestsProps> {
 			);
 		} else if (!closedDate) {
 			return null;
-		}
-		if (mergeStatus == PullRequestStatus.Abandoned) {
-			return (
-				<React.Fragment>
-					<div className="pr-status pr-status-abandoned"><div>Abandoned</div></div> {closedDate.toLocaleString()}<br />
-				</React.Fragment>
-			);
 		}
 		return (
 			<React.Fragment>
