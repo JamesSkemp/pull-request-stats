@@ -32,8 +32,11 @@ export class PullRequestsListing extends React.Component<PullRequestsListingProp
 			return (
 				<Card className="pull-request-listing"
 					titleProps={{ text: this.props.title, ariaLevel: 2 }}>
-					<section>
-						<p>There are no matching pull requests.</p>
+					<section className="open-pull-requests">
+						<Icon iconName="Refresh" onClick={ () => this.props.refreshFn() } />
+						<section>
+							There are no matching pull requests.
+						</section>
 					</section>
 				</Card>
 			);
