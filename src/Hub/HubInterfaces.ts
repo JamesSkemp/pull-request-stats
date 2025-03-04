@@ -1,4 +1,4 @@
-import { PullRequestAsyncStatus, PullRequestStatus } from "azure-devops-extension-api/Git";
+import { PullRequestAsyncStatus, PullRequestStatus } from "azure-devops-extension-api/bin/Git";
 
 export interface IPullRequest {
 	repositoryId: string;

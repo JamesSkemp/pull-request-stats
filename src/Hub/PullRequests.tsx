@@ -3,7 +3,7 @@ import * as React from "react";
 import "./PullRequests.scss";
 import { IPullRequest } from "./HubInterfaces";
 import { VoteDisplay } from "./VoteDisplay";
-import { PullRequestStatus } from "azure-devops-extension-api/Git";
+import { PullRequestStatus } from "azure-devops-extension-api/bin/Git";
 import { Icon } from "azure-devops-ui/Icon";
 
 export interface PullRequestsProps {

@@ -1,4 +1,4 @@
-import { GitPullRequest, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/Git";
+import { GitPullRequest, GitRestClient, PullRequestStatus } from 'azure-devops-extension-api/bin/Git';
 
 export declare class CustomExtendedGitRestClient extends GitRestClient {
 	getPullRequestsByProject(project: string): Promise<GitPullRequest[]>;

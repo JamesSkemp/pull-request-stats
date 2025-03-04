@@ -4,7 +4,7 @@ import "./PullRequestsListing.scss";
 import { Card } from "azure-devops-ui/Card";
 import { IPullRequest } from "./HubInterfaces";
 import { getTypedPullRequest } from "./HubUtil";
-import { GitPullRequest } from "azure-devops-extension-api/Git";
+import { GitPullRequest } from "azure-devops-extension-api/bin/Git";
 import { VoteDisplay } from "./VoteDisplay";
 import { Icon } from "azure-devops-ui/Icon";
 

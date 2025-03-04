@@ -8,8 +8,8 @@ import { showRootComponent } from "../Common";
 
 import { Page } from "azure-devops-ui/Page";
 import { Header } from "azure-devops-ui/Header";
-import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, IProjectPageService, getClient } from "azure-devops-extension-api";
-import { GitPullRequest, GitRestClient } from "azure-devops-extension-api/Git";
+import { CommonServiceIds, IGlobalMessagesService, IProjectInfo, IProjectPageService, getClient } from "azure-devops-extension-api/bin";
+import { GitPullRequest, GitRestClient } from "azure-devops-extension-api/bin/Git";
 import { CustomExtendedGitRestClient } from "../custom-typings";
 import { PullRequestsListing } from "./PullRequestsListing";
 import { PullRequestsStats } from "./PullRequestsStats";

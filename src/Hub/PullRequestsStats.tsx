@@ -1,13 +1,13 @@
 import * as React from "react";
 import * as SDK from "azure-devops-extension-sdk";
 import "./PullRequestsStats.scss";
-import { GitPullRequest, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/Git";
+import { GitPullRequest, GitRestClient, PullRequestStatus } from "azure-devops-extension-api/bin/Git";
 import { IPullRequest } from "./HubInterfaces";
 import { Card } from "azure-devops-ui/Card";
 import { getTypedPullRequest } from "./HubUtil";
 import { PullRequests } from "./PullRequests";
 import { CustomExtendedGitRestClient } from "../custom-typings";
-import { CommonServiceIds, IExtensionDataService, IGlobalMessagesService, IProjectInfo, getClient } from "azure-devops-extension-api";
+import { CommonServiceIds, IExtensionDataService, IGlobalMessagesService, IProjectInfo, getClient } from "azure-devops-extension-api/bin";
 import { Dropdown } from "azure-devops-ui/Dropdown";
 import { IListBoxItem } from "azure-devops-ui/ListBox";
 import { ListSelection } from "azure-devops-ui/List";
@@ -175,6 +175,7 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 						<Tab name="Reviewers" id="reviewers" />
 						<Tab name="Total Reviewers" id="reviewers-total" />
 						<Tab name="Close Times" id="close-times" />
+						<Tab name="List" id="listing" />
 						<Tab name="Settings" id="settings" />
 					</TabBar>
 
@@ -363,6 +364,12 @@ export class PullRequestsStats extends React.Component<PullRequestsStatsProps, I
 							/>
 						</div>
 					</section>
+				</section>
+			);
+		} else if (selectedTabId === 'listing') {
+			return (
+				<section>
+					<PullRequests pullRequests={this.filteredPullRequests} heading="Pull Requests"></PullRequests>
 				</section>
 			);
 		} else {
